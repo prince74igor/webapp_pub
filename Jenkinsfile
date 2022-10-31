@@ -16,7 +16,7 @@ pipeline {
     stage ('Check-Git-Secrets') {
       steps {
         sh 'rm trufflehog || true'
-        sh 'docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog'
+        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog || true'
         sh 'cat trufflehog'
       }
     }
