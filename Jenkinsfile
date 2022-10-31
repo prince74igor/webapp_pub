@@ -15,7 +15,7 @@ pipeline {
     
     stage ('Check-Git-Secrets') {
       steps {
-        sshagent(['secrets']) {
+        sshagent(credentials: ['secrets']) {
         sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "rm trufflehog" || true'
         sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog || true'
         sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "cat trufflehog" || true'
