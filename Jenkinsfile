@@ -1,3 +1,10 @@
+def remote = [:]
+    remote.name = 'kali'
+    remote.host = '10.7.2.224'
+    remote.user = 'kali'
+    remote.password = 'kali'
+    remote.allowAnyHosts = true
+
 pipeline {
   agent any 
   tools {
@@ -12,6 +19,15 @@ pipeline {
             ''' 
       }
     }
+    
+    stage('Remote SSH') {
+      sshCommand remote: remote, command: "rm owasp-dependency-check* || true"
+      sshCommand remote: remote, command: "wget "https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh"
+      sshCommand remote: remote, command: "chmod +x owasp-dependency-check.sh"
+      sshCommand remote: remote, command: "bash owasp-dependency-check.sh"    
+      sshCommand remote: remote, command: "cat /var/lib/jenkins/OWASP-Dependency-Check/reports/dependency-check-report.xml"     
+        }
+      
     
     stage ('Source Composition Analysis') {
       steps {
