@@ -13,20 +13,9 @@ pipeline {
       }
     }
     
-    stage ('Check-Git-Secrets') {
-      steps {
-        sshagent(credentials: ['secrets']) {
-        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "rm trufflehog" || true'
-        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog" || true'
-        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "cat trufflehog" || true'
-        }
-      }
-    }      
-    
     stage ('Source Composition Analysis') {
       steps {
-         sh 'rm owasp* || true'
-         sh 'sudo apt install wget'
+         sh 'rm owasp-dependency-check* || true'
          sh 'wget "https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh" '
          sh 'chmod +x owasp-dependency-check.sh'
          sh 'bash owasp-dependency-check.sh'
@@ -62,10 +51,18 @@ pipeline {
     stage ('DAST') {
       steps {
         sshagent(['zap']) {
-         sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 "docker run -t owasp/zap2docker-stable zap-baseline.py -t http://13.232.202.25:8080/webapp/" || true'
+         sh '"docker run -t owasp/zap2docker-stable zap-baseline.py -t http://10.211.55.9:8080/webapp/" || true'
         }
       }
     }
+    
+        stage ('Check-Git-Secrets') {
+      steps {
+        sshagent(credentials: ['secrets']) {
+        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 && "rm trufflehog" || true && docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog" || true && cat trufflehog" '
+        }
+      }
+    }      
     
   }
 }
