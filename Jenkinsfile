@@ -23,10 +23,10 @@ pipeline {
       remote.password = 'kali'
       remote.allowAnyHosts = true
       sshCommand remote: remote, command: "rm owasp-dependency-check* || true"
-      sshCommand remote: remote, command: "wget https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh"
+      sshCommand remote: remote, command: "wget | grep "found" || true && sudo apt install wget && wget https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh"
       sshCommand remote: remote, command: "chmod +x owasp-dependency-check.sh"
       sshCommand remote: remote, command: "bash owasp-dependency-check.sh"    
-      sshCommand remote: remote, command: "cat /var/lib/jenkins/OWASP-Dependency-Check/reports/dependency-check-report.xml"     
+      sshCommand remote: remote, command: "cat OWASP-Dependency-Check/reports/dependency-check-report.xml"     
         }
                      }
                 }
