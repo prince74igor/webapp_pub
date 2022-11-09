@@ -12,26 +12,7 @@ pipeline {
             ''' 
       }
     }
-    
-    stage('Remote SSH') {
-         steps {
-           script {
-      def remote = [:]
-      remote.name = 'kali'
-      remote.host = '10.7.2.224'
-      remote.user = 'kali'
-      remote.password = 'kali'
-      remote.allowAnyHosts = true
-      sshCommand remote: remote, command: "rm owasp-dependency-check* || true"
-      sshCommand remote: remote, command: "wget https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh"
-      sshCommand remote: remote, command: "chmod +x owasp-dependency-check.sh"
-      sshCommand remote: remote, command: "sudo ./owasp-dependency-check.sh --purge"
-      sshCommand remote: remote, command: "cat OWASP-Dependency-Check/reports/dependency-check-report.xml"
-        }
-                     }
-                }
-      
-    
+ 
     stage ('Source Composition Analysis') {
       steps {
          sh 'rm owasp-dependency-check* || true'
@@ -61,7 +42,7 @@ pipeline {
     stage ('Deploy-To-Tomcat') {
             steps {
            sshagent(['tomcat']) {
-                sh 'scp -o StrictHostKeyChecking=no target/*.war drake@10.211.55.9:/prod/apache-tomcat-8.5.39/webapps/webapp.war'
+                sh 'scp -o StrictHostKeyChecking=no target/*.war kali@192.168.129:/prod/apache-tomcat-8.5.39/webapps/webapp.war'
               }      
            }       
     }
@@ -78,7 +59,7 @@ pipeline {
         stage ('Check-Git-Secrets') {
       steps {
         sshagent(credentials: ['secrets']) {
-        sh 'ssh -o  StrictHostKeyChecking=no drake@10.211.55.9 && "rm trufflehog" || true && docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog" || true && cat trufflehog" '
+        sh ' "rm trufflehog" || true && docker run gesellix/trufflehog --json https://github.com/prince74igor/webapp_pub.git > trufflehog" || true && cat trufflehog" '
         }
       }
     }      
