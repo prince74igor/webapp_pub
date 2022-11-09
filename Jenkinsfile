@@ -15,12 +15,12 @@ pipeline {
  
     stage ('Source Composition Analysis') {
       steps {
-         sh 'rm owasp-dependency-check* || true'
-         sh 'wget "https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh" '
-         sh 'chmod +x owasp-dependency-check.sh'
-         sh 'sudo ./owasp-dependency-check.sh'
-         sh 'cat /var/lib/jenkins/OWASP-Dependency-Check/reports/dependency-check-report.xml'
-        
+         sh 'rm dependency-check* || true'
+         sh 'wget "https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip" '
+         sh 'dpkg -s unzip & sudo apt install unzip'
+         sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin'       
+         sh './dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/"'          
+         sh 'cp -R . /home/kali'
       }
     }
     
