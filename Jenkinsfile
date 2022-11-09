@@ -15,11 +15,10 @@ pipeline {
  
     stage ('Source Composition Analysis') {
       steps {
-         sh 'rm dependency-check* || true'
          sh 'wget "https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip" || true '
          sh 'dpkg -s unzip || sudo apt install unzip'
-         sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/"'          
-         sh 'cp -R . /home/kali'
+         sh 'dpkg -s npm || sudo apt install npm'
+         sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/" && cp -R . /home/kali '
       }
     }
     
