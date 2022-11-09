@@ -17,11 +17,10 @@ pipeline {
       steps {
          sh 'wget "https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip" || true '
          sh 'dpkg -s unzip || sudo apt install unzip'
-         sh 'dpkg -s npm || sudo apt install npm && npm install -g pnpm'
-         sh 'dpkg -s npm || sudo gem install bundler-audit && bundle-audit update' 
-         sh 'dpkg -s yarn || sudo gem yarn '         
-        
-         
+         sh 'dpkg -s npm || sudo apt install npm'
+         sh 'gem list -i "^bundler-audit$" || sudo gem install bundler-audit && bundle-audit update'
+         sh 'gem list -i "^yarn$" || sudo gem install yarn '  
+         sh 'wget -qO- https://get.pnpm.io/install.sh | sh - || true '
          sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/" && cp -R . /home/kali '
       }
     }
