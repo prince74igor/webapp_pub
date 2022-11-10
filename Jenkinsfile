@@ -22,14 +22,17 @@ pipeline {
       remote.user = 'kali'
       remote.password = 'kali'
       remote.allowAnyHosts = true
-      sshCommand remote: remote, command: "rm owasp-dependency-check* || true"
-      sshCommand remote: remote, command: "wget https://raw.githubusercontent.com/prince74igor/webapp_pub/master/owasp-dependency-check.sh"
-      sshCommand remote: remote, command: "chmod +x owasp-dependency-check.sh"
-      sshCommand remote: remote, command: "sudo ./owasp-dependency-check.sh --purge"
-      sshCommand remote: remote, command: "cat OWASP-Dependency-Check/reports/dependency-check-report.xml"
+         sshCommand remote: remote, command:  'wget "https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip" || true '
+         sshCommand remote: remote, command:  'dpkg -s unzip || sudo apt install unzip'
+         sshCommand remote: remote, command:  'dpkg -s npm || sudo apt install npm'
+         sshCommand remote: remote, command:  'gem list -i "^bundler-audit$" || sudo gem install bundler-audit && bundle-audit update'
+         sshCommand remote: remote, command:  'gem list -i "^yarn$" || sudo gem install yarn '  
+         sshCommand remote: remote, command:  'wget -qO- https://get.pnpm.io/install.sh | sh - || true '
+         sshCommand remote: remote, command:  'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/" && cp -R . /home/kali '
         }
                      }
                 }
+    
       
     
     stage ('Source Composition Analysis') {
