@@ -28,7 +28,8 @@ pipeline {
     stage ('SAST') {
       steps {
         withSonarQubeEnv('sonar') {
-          sh 'mvn sonar:sonar'
+          sh 'dpkg -s maven || sudo apt install maven -y'          
+          sh 'mvn sonar:sonar -Dsonar.login=myAuthenticationToken'
           sh 'cat target/sonar/report-task.txt'
         }
       }
