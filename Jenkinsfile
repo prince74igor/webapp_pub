@@ -17,8 +17,8 @@ pipeline {
       steps {
          sh 'dpkg -s unzip || sudo apt install unzip'
          sh 'dpkg -s npm || sudo apt install npm -y'
-         sh 'gem list -i "^bundler-audit$" || sudo gem install bundler-audit && bundle-audit update'
-         sh 'gem list -i "^yarn$" || sudo gem install yarn'  
+         sh 'gem list -i "^bundler-audit$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 bundler-audit && bundle-audit update'
+         sh 'gem list -i "^yarn$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 yarn'  
          sh 'wget -qO- https://get.pnpm.io/install.sh | sh - || true '
          sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/" && cp -R . /home/kali '
       }
