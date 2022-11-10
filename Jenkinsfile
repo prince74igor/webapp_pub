@@ -29,6 +29,7 @@ pipeline {
       steps {
         withSonarQubeEnv('sonar') {
           sh 'dpkg -s maven || sudo apt install maven -y'          
+          sh 'mvn clean install'
           sh 'mvn sonar:sonar -Dsonar.login=myAuthenticationToken'
           sh 'cat target/sonar/report-task.txt'
         }
