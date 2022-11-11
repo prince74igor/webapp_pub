@@ -13,24 +13,59 @@ pipeline {
       }
     }
  
-    stage ('Source Composition Analysis') {
+   stage ('preparing') {
       steps {
          sh 'dpkg -s unzip || sudo apt install unzip'
          sh 'dpkg -s npm || sudo apt install npm -y'
          sh 'gem list -i "^bundler-audit$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 bundler-audit'
-         sh 'bundle-audit update'
          sh 'gem list -i "^yarn$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 yarn'  
-         sh 'wget -qO- https://get.pnpm.io/install.sh | sh - || true '
-         sh 'unzip -u dependency-check-7.3.0-release.zip && cd dependency-check/bin && ./dependency-check.sh --project "My App Name" --scan "/home/kali/DependencyCheck/" && cp -R . /home/kali '
+         sh 'dpkg -s npm || wget -qO- https://get.pnpm.io/install.sh | sh - || true '
+         sh 'bundle-audit update'
+         sh 'service docker status | grep running || sudo service docker start '
+      }
+    }    
+
+    stage ('SCA_sh') {
+      steps {
+         sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
+         sh 'unzip -u dependency-check-7.3.0-release.zip'
+         sh './dependency-check/bin/dependency-check.sh --project "DVWA" --scan "/home/kali/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
       }
     }
     
-    stage ('SAST') {
+     stage ('SCA_docker') {
+      steps {
+         sh 'cd ~/DVWA && wget https://github.com/prince74igor/webapp_pub/blob/master/owasp-dependency-check.sh && sudo sh owasp-dependency-check.sh '
+      }
+    }
+    
+    stage ('SAST_maven') {
       steps {
         withSonarQubeEnv('sonar') {
-          sh 'dpkg -s maven || sudo apt install maven -y'          
-          sh 'mvn clean install'
-          sh 'mvn sonar:sonar -Dsonar.login=myAuthenticationToken'
+          sh 'sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
+          sh 'dpkg -s maven || sudo apt install maven -y'
+          sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
+          sh 'wget https://github.com/prince74igor/webapp_pub.git '
+          sh 'cd ~/webapp_pub && mvn sonar:sonar -Dsonar.projectKey=12312312sdsdf \
+                                       -Dsonar.sources=. \
+                                       -Dsonar.host.url=http://127.0.0.1:9000 \
+                                       -Dsonar.login=sqp_2b05ee5c9d069b7222144f8a8cf534047493dd28'
+          sh 'cat target/sonar/report-task.txt'
+        }
+      }
+    }
+    
+    stage ('SAST_source') {
+      steps {
+        withSonarQubeEnv('sonar') {
+          sh 'sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
+          sh 'dpkg -s maven || sudo apt install maven -y'
+          sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
+          sh 'wget https://github.com/prince74igor/webapp_pub.git '
+          sh 'cd ~/webapp_pub && mvn sonar:sonar -Dsonar.projectKey=12312312sdsdf \
+                                       -Dsonar.sources=. \
+                                       -Dsonar.host.url=http://127.0.0.1:9000 \
+                                       -Dsonar.login=sqp_2b05ee5c9d069b7222144f8a8cf534047493dd28'
           sh 'cat target/sonar/report-task.txt'
         }
       }
