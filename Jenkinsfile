@@ -35,7 +35,7 @@ pipeline {
     
      stage ('SCA_docker') {
       steps {
-         sh 'cd ~/DVWA && wget https://github.com/prince74igor/webapp_pub/blob/master/owasp-dependency-check.sh && sudo sh owasp-dependency-check.sh '
+         sh 'wget https://github.com/prince74igor/webapp_pub/blob/master/owasp-dependency-check.sh && cp webapp_pub/owasp-dependency-check.sh ~/DVWA && cd ~/DVWA && cp sudo sh owasp-dependency-check.sh '
       }
     }
     
