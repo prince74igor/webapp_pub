@@ -26,6 +26,8 @@ docker run --rm \
     --volume $(pwd)/odc-reports:/report:z \
     owasp/dependency-check:$DC_VERSION \
     --scan /src \
+    --proxyserver proxy.compassplus.ru \
+    --proxyport 3128 \
     --format "ALL" \
     --project "$DC_PROJECT" \
     --out /report
