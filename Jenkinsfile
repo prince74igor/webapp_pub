@@ -13,23 +13,40 @@ pipeline {
       }
     }
  
-   stage ('preparing') {
+   stage ('preparing_tools') {
       steps {
          sh 'dpkg -s unzip || sudo apt install unzip'
          sh 'dpkg -s npm || sudo apt install npm -y'
          sh 'gem list -i "^bundler-audit$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 bundler-audit'
          sh 'gem list -i "^yarn$" || sudo gem install --http-proxy http://proxy.compassplus.ru:3128 yarn'  
          sh 'dpkg -s npm || wget -qO- https://get.pnpm.io/install.sh | sh - || true '
-         sh 'bundle-audit update'
-         sh 'service docker status | grep running || sudo service docker start '
+         sh 'bundle-audit update'        
       }
     }    
-
+       stage ('preparing_docker') {
+      steps {
+         sh 'dpkg -s docker || sudo apt install -y docker.io && sudo systemctl enable docker --now'
+         sh 'git clone https://github.com/prince74igor/webapp_pub.git && cp /webapp_pub/docker_proxy . && bash docker_proxy'
+      }
+    }
+       stage ('preparing_jenkins') {
+      steps {
+         sh 'cp /webapp_pub/docker_jenkins . && bash docker_proxy'
+      }
+    }    
+    
+    
+       stage ('preparing_DVWA') {
+      steps {
+         sh 'git clone https://github.com/digininja/DVWA.git'
+      }
+    }
+    
     stage ('SCA_sh') {
       steps {
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
          sh 'unzip -u dependency-check-7.3.0-release.zip'
-         sh './dependency-check/bin/dependency-check.sh --project "DVWA" --scan "/home/kali/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh './dependency-check/bin/dependency-check.sh --project "DVWA" --scan "~/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
       }
     }
     
