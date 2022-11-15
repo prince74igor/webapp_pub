@@ -1,0 +1,9 @@
+#!/bin/bash
+sudo mkdir /etc/systemd/system/docker.service.d
+sudo touch /etc/systemd/system/docker.service.d/http-proxy.conf
+echo '[Service]
+Environment="HTTP_PROXY=http://proxy.compassplus.ru:3128/"
+Environment="HTTPS_PROXY=http://proxy.compassplus.ru:3128/"
+Environment="NO_PROXY="localhost,127.0.0.1,::1"' | sudo tee -a /etc/systemd/system/docker.service.d/http-proxy.conf > /dev/null
+sudo systemctl daemon-reload
+sudo systemctl restart docker
