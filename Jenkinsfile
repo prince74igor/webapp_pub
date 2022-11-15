@@ -76,12 +76,12 @@ pipeline {
       steps {
         withSonarQubeEnv('sonar') {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
-          sh 'cd ~/DVWA && sudo docker run \
+          sh 'sudo docker run \
                                          --rm \
                                          -e SONAR_HOST_URL="http://172.17.0.2:9000" \
-                                         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=DVWA" \
-                                         -e SONAR_LOGIN="sqp_75818359e0f9dee8edd582e06f8c345bbc381e91" \
-                                         -v "DVWA:/home/kali/DVWA" \
+                                         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=a4" \
+                                         -e SONAR_LOGIN="sqp_b57a4d6e622456352ccb502efbc4e0be3ecf5bce" \
+                                         -v "/home/kali/DVWA:/usr/src" \
                                          sonarsource/sonar-scanner-cli'
         }
       }
