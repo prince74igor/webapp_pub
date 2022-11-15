@@ -58,15 +58,14 @@ pipeline {
     stage ('SAST_source') {
       steps {
         withSonarQubeEnv('sonar') {
-          sh 'sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
-          sh 'dpkg -s maven || sudo apt install maven -y'
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
-          sh 'wget https://github.com/prince74igor/webapp_pub.git '
-          sh 'cd ~/webapp_pub && mvn sonar:sonar -Dsonar.projectKey=12312312sdsdf \
-                                       -Dsonar.sources=. \
-                                       -Dsonar.host.url=http://127.0.0.1:9000 \
-                                       -Dsonar.login=sqp_2b05ee5c9d069b7222144f8a8cf534047493dd28'
-          sh 'cat target/sonar/report-task.txt'
+          sh 'cd ~/DVWA && sudo docker run \
+                                         --rm \
+                                         -e SONAR_HOST_URL="http://172.17.0.2:9000" \
+                                         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=DVWA" \
+                                         -e SONAR_LOGIN="sqp_75818359e0f9dee8edd582e06f8c345bbc381e91" \
+                                         -v "DVWA:/home/kali/DVWA" \
+                                         sonarsource/sonar-scanner-cli'
         }
       }
     }
