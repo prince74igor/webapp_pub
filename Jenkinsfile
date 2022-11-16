@@ -28,14 +28,14 @@ pipeline {
        stage ('preparing_docker') {
       steps {
          sh 'dpkg -s docker || sudo apt install -y docker.io && sudo systemctl enable docker --now'
-         sh 'git clone https://github.com/prince74igor/webapp_pub.git && bash ~/webapp_pub/docker_proxy'
+         sh 'git clone https://github.com/prince74igor/webapp_pub.git --progress && bash ~/webapp_pub/docker_proxy'
       }
     } 
        
        stage ('preparing_DVWA&WebApp') {
       steps {
-         sh 'git clone https://github.com/digininja/DVWA.git'
-         sh 'git clone https://github.com/prince74igor/webapp_pub.git'
+         sh 'git clone https://github.com/digininja/DVWA.git --progress'
+         sh 'git clone https://github.com/prince74igor/webapp_pub.git --progress'
       }
     }
     
