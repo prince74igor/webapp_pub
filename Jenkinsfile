@@ -96,7 +96,7 @@ pipeline {
                  -Dsonar.sources=/home/kali/TW_ACS/ \
                  -Dsonar.host.url=http://10.7.2.224:9000 \
                  -Dsonar.login=sqp_08c08cc4e5cac12dca23a6886fde7bb5e47f9f4e \
-                 -Dsonar.java.binaries=/home/kali/TW_ACS/
+                 -Dsonar.java.binaries=/home/kali/TW_ACS/ '
         }
       }
     }
