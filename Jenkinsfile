@@ -78,7 +78,7 @@ pipeline {
                                          -e SONAR_HOST_URL="http://172.17.0.2:9000" \
                                          -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=a4" \
                                          -e SONAR_LOGIN="sqp_b57a4d6e622456352ccb502efbc4e0be3ecf5bce" \
-                                         -e SONAR_JAVA_BINARIES=/home/kali/TW_ACS/
+                                         -e SONAR_JAVA_BINARIES="/home/kali/TW_ACS/" \
                                          -v "/home/kali/DVWA:/usr/src" \
                                          sonarsource/sonar-scanner-cli'
         }
@@ -88,7 +88,6 @@ pipeline {
       stage ('SAST_source') {
          steps {
            withSonarQubeEnv('sonar') {
-              sh ''
               sh 'wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip'
               sh 'unzip -u sonar-scanner-cli-4.7.0.2747-linux.zip'
               sh './sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
@@ -103,16 +102,8 @@ pipeline {
     
     stage ('Build') {
       steps {
-      sh 'mvn clean package'
+      sh 'cd ~/webapp_pub && mvn clean package'
        }
-    }
-    
-    stage ('Deploy-To-Tomcat') {
-            steps {
-           sshagent(['tomcat']) {
-                sh 'scp -o StrictHostKeyChecking=no target/*.war kali@192.168.129:/prod/apache-tomcat-8.5.39/webapps/webapp.war'
-              }      
-           }       
     }
     
     
