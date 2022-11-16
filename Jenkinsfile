@@ -3,6 +3,7 @@ pipeline {
   tools {
     maven '3.8.6'
   }
+  
   stages {
     stage ('Initialize') {
       steps {
@@ -22,23 +23,19 @@ pipeline {
          sh 'dpkg -s npm || wget -qO- https://get.pnpm.io/install.sh | sh - || true '
          sh 'bundle-audit update'        
       }
-    }    
+    }  
+    
        stage ('preparing_docker') {
       steps {
          sh 'dpkg -s docker || sudo apt install -y docker.io && sudo systemctl enable docker --now'
-         sh 'git clone https://github.com/prince74igor/webapp_pub.git && cp /webapp_pub/docker_proxy . && bash docker_proxy'
+         sh 'git clone https://github.com/prince74igor/webapp_pub.git && bash ~/webapp_pub/docker_proxy'
       }
-    }
-       stage ('preparing_jenkins') {
-      steps {
-         sh 'cp /webapp_pub/docker_jenkins . && bash docker_proxy'
-      }
-    }    
-    
-    
-       stage ('preparing_DVWA') {
+    } 
+       
+       stage ('preparing_DVWA&WebApp') {
       steps {
          sh 'git clone https://github.com/digininja/DVWA.git'
+         sh 'git clone https://github.com/prince74igor/webapp_pub.git'
       }
     }
     
@@ -46,13 +43,13 @@ pipeline {
       steps {
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
          sh 'unzip -u dependency-check-7.3.0-release.zip'
-         sh './dependency-check/bin/dependency-check.sh --project "DVWA" --scan "~/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "DVWA" --scan "~/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
       }
     }
     
      stage ('SCA_docker') {
       steps {
-         sh 'wget https://github.com/prince74igor/webapp_pub/blob/master/owasp-dependency-check.sh && cp webapp_pub/owasp-dependency-check.sh ~/DVWA && cd ~/DVWA && cp sudo sh owasp-dependency-check.sh '
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/DVWA && bash ~/DVWA/owasp-dependency-check.sh'
       }
     }
     
