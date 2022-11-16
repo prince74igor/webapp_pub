@@ -69,7 +69,7 @@ pipeline {
       }
     }
     
-    stage ('SAST_source') {
+    stage ('SAST_source_docker') {
       steps {
         withSonarQubeEnv('sonar') {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
@@ -85,7 +85,7 @@ pipeline {
       }
     }
     
-      stage ('SAST_source') {
+      stage ('SAST_source_sh') {
          steps {
            withSonarQubeEnv('sonar') {
               sh 'wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip'
