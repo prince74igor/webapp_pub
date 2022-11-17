@@ -114,7 +114,7 @@ pipeline {
     stage ('DAST') {
       steps {
         sshagent(['zap']) {
-         sh '"docker run -t owasp/zap2docker-stable zap-baseline.py -t http://10.211.55.9:8080/webapp/" || true'
+         sh '"sudo docker run -t owasp/zap2docker-stable zap-full-scan.py -t http://10.77.207.92:2028/" || true'
         }
       }
     }
