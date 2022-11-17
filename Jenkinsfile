@@ -28,7 +28,7 @@ pipeline {
        stage ('preparing_docker') {
       steps {
          sh 'dpkg -s docker || sudo apt install -y docker.io && sudo systemctl enable docker --now'
-         sh 'la ~ | grep webapp_pub || git clone https://github.com/prince74igor/webapp_pub.git && bash ~/webapp_pub/docker_proxy'
+         sh 'la ~ | grep webapp_pub | git clone https://github.com/prince74igor/webapp_pub.git && bash ~/webapp_pub/docker_proxy > /dev/null'
       }
     } 
        
