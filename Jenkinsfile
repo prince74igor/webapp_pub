@@ -28,14 +28,14 @@ pipeline {
        stage ('preparing_docker') {
       steps {
          sh 'dpkg -s docker || sudo apt install -y docker.io && sudo systemctl enable docker --now'
-         sh 'la ~ | grep webapp_pub | git clone https://github.com/prince74igor/webapp_pub.git && bash ~/webapp_pub/docker_proxy > /dev/null'
       }
     } 
+ 
        
-       stage ('preparing_DVWA&WebApp') {
+       stage ('preparing_sources') {
       steps {
-         sh 'git clone https://github.com/digininja/DVWA.git --progress'
-         sh 'git clone https://github.com/prince74igor/webapp_pub.git --progress'
+         sh 'la . | grep DVWA | git clone https://github.com/digininja/DVWA.git'
+         sh 'la . | grep webapp_pub | git clone https://github.com/prince74igor/webapp_pub.git'
       }
     }
     
@@ -44,27 +44,31 @@ pipeline {
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
          sh 'unzip -u dependency-check-7.3.0-release.zip'
          sh 'bash ~/dependency-check/bin/dependency-check.sh --project "DVWA" --scan "~/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "webapp_pub" --scan "~/webapp_pub" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS" --scan "~/TW_ACS" --proxyserver proxy.compassplus.ru --proxyport 3128 '
       }
     }
     
      stage ('SCA_docker') {
       steps {
          sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/DVWA && bash ~/DVWA/owasp-dependency-check.sh'
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/DVWA && bash ~/webapp_pub/owasp-dependency-check.sh'
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS && bash ~/TW_ACS/owasp-dependency-check.sh'
       }
     }
     
     stage ('SAST_maven') {
       steps {
         withSonarQubeEnv('sonar') {
-          sh 'sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
           sh 'dpkg -s maven || sudo apt install maven -y'
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
-          sh 'wget https://github.com/prince74igor/webapp_pub.git '
           sh 'cd ~/webapp_pub && mvn sonar:sonar -Dsonar.projectKey=12312312sdsdf \
-                                       -Dsonar.sources=. \
-                                       -Dsonar.host.url=http://127.0.0.1:9000 \
-                                       -Dsonar.login=sqp_2b05ee5c9d069b7222144f8a8cf534047493dd28'
-          sh 'cat target/sonar/report-task.txt'
+                                         -Dsonar.sources=. \
+                                         -Dsonar.host.url=http://127.0.0.1:9000 \
+                                         -Dsonar.projectKey=a4 \
+                                         -DproxyHost=proxy.compassplus.ru -DproxyPort=3128 \
+                                         -Dsonar.login=sqp_2b05ee5c9d069b7222144f8a8cf534047493dd28'
+          sh 'cat ~/webapp_pub/target/sonar/report-task.txt'
         }
       }
     }
@@ -76,7 +80,7 @@ pipeline {
           sh 'sudo docker run \
                                          --rm \
                                          -e SONAR_HOST_URL="http://172.17.0.2:9000" \
-                                         -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=a4" \
+                                         -e SONAR_SCANNER_OPTS="TW_ACS" \
                                          -e SONAR_LOGIN="sqp_b57a4d6e622456352ccb502efbc4e0be3ecf5bce" \
                                          -e SONAR_JAVA_BINARIES="/home/kali/TW_ACS/" \
                                          -v "/home/kali/DVWA:/usr/src" \
@@ -100,9 +104,9 @@ pipeline {
       }
     }
     
-    stage ('Build') {
+    stage ('Build_TW_ACS') {
       steps {
-      sh 'cd ~/webapp_pub && mvn clean package'
+      sh 'cd ~/webapp_pub && npm install && npm run build && gdradle build'
        }
     }
     
