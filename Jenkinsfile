@@ -43,9 +43,11 @@ pipeline {
       steps {
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
          sh 'unzip -u dependency-check-7.3.0-release.zip'
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "DVWA" --scan "~/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "webapp_pub" --scan "~/webapp_pub" --proxyserver proxy.compassplus.ru --proxyport 3128 '
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS" --scan "~/TW_ACS" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "DVWA" --scan "/home/kali/DVWA" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "webapp_pub" --scan "/home/kali/webapp_pub" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS" --scan "/home/kali/TW_ACS" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'rm -r ~/TW_ACS_GIT/iad-ecacs2/protocols/emv/'
+         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_GIT" --scan "/home/kali/TW_ACS_GIT" --proxyserver proxy.compassplus.ru --proxyport 3128 '
       }
     }
     
