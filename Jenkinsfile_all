@@ -38,7 +38,15 @@ pipeline {
          sh 'la . | grep webapp_pub | git clone https://github.com/prince74igor/webapp_pub.git'
       }
     }
-    
+ 
+       stage ('SAST_Gradle') {
+         steps {
+              sh 'cat /home/kali/TW_ACS_GIT/iad-ecacs2/gradle.properties | grep 9000 | echo "systemProp.sonar.host.url=http://localhost:9000" >> /home/kali/TW_ACS_GIT/iad-ecacs2/gradle.properties'
+              sh 'cat /home/kali/TW_ACS_GIT/iad-web-app-core/gradle.properties | grep 9000 | echo "systemProp.sonar.host.url=http://localhost:9000" >> /home/kali/TW_ACS_GIT/iad-web-app-core/gradle.properties' 
+  
+        }
+      }
+      
     stage ('SCA_sh') {
       steps {
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v7.3.0/dependency-check-7.3.0-release.zip '
