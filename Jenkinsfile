@@ -38,13 +38,13 @@ pipeline {
       }
     }
     
-    stage ('SAST_source_docker') {
+    stage ('SAST_source_docker') { ++++++++++++++++++++++++++++++++++++++
       steps {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
           sh 'sudo docker run \
                                                                                 --rm \
                                                                                 -e SONAR_HOST_URL="http://172.17.0.2:9000" \
-                                                                                -e SONAR_SCANNER_OPTS="TW_ACS_GIT" \
+                                                                                -e SONAR_SCANNER_OPTS="TW_ACS_CORE" \
                                                                                 -e SONAR_LOGIN="sqp_60500b4ec358a7sqp_6b303be2d0c0d1d0b5531fb752baadf59acfe389" \
                                                                                 -e SONAR_JAVA_BINARIES="/home/kali/TW_ACS_GIT/iad-ecacs2" \
                                                                                 -v "/home/kali/TW_ACS_GIT/iad-ecacs2:/usr/src" \
@@ -52,21 +52,28 @@ pipeline {
         }
       }
     
-    
       stage ('SAST_sh') {
          steps {
-           withSonarQubeEnv('sonar') {
-              sh 'wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip'
-              sh 'unzip -u sonar-scanner-cli-4.7.0.2747-linux.zip'
-              sh './sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
-                 -Dsonar.projectKey=TW_ACS \
-                 -Dsonar.sources=/home/kali/TW_ACS/ \
-                 -Dsonar.host.url=http://10.7.2.224:9000 \
-                 -Dsonar.login=sqp_08c08cc4e5cac12dca23a6886fde7bb5e47f9f4e \
-                 -Dsonar.java.binaries=/home/kali/TW_ACS/ '
-        }
+              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
+                                      -Dsonar.projectKey=TW_ACS_CORE \
+                                      -Dsonar.sources=/home/kali/TW_ACS_GIT/iad-ecacs2 \
+                                      -Dsonar.host.url=http://localhost:9000 \
+                                      -Dsonar.login=sqp_905ffe1d5b3316e808b8a19ae6591c5d69210476 \
+                                      -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-ecacs2'
+              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
+                                      -Dsonar.projectKey=TW_ACS_WEB \
+                                      -Dsonar.sources=/home/kali/TW_ACS_GIT/iad-web-app-core \
+                                      -Dsonar.host.url=http://localhost:9000 \
+                                      -Dsonar.login=sqp_b6aaa0ae304206af981a8b13d6f5c9e1f3191a07 \
+                                      -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-web-app-core'
+              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
+                                      -Dsonar.projectKey=TW_ACS_JS \
+                                      -Dsonar.sources=/home/kali/TW_ACS_GIT/iad-js-utils \
+                                      -Dsonar.host.url=http://localhost:9000 \
+                                      -Dsonar.login=sqp_b6e6792b5f85b4f8b1b14f507bf60488a2f852f4 \
+                                      -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-js-utils'
+         }
       }
-    }
     
     stage ('Build_TW_ACS') {
       steps {
