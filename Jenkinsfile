@@ -22,22 +22,6 @@ pipeline {
       }
     }
     
-    stage ('SCA_sh') {
-      steps {
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_CORE" --scan "/home/kali/TW_ACS_GIT/iad-ecacs2" --proxyserver proxy.compassplus.ru --proxyport 3128 '
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_WEB" --scan "/home/kali/TW_ACS_GIT/iad-web-app-core" --proxyserver proxy.compassplus.ru --proxyport 3128 '
-         sh 'bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_JS" --scan "/home/kali/TW_ACS_GIT/iad-js-utils" --proxyserver proxy.compassplus.ru --proxyport 3128 '
-      }
-    }
-    
-     stage ('SCA_docker') {
-      steps {
-         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-ecacs2 && bash ~/TW_ACS_GIT/iad-ecacs2/owasp-dependency-check.sh'
-         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-web-app-core && bash ~/TW_ACS_GIT/iad-web-app-core/owasp-dependency-check.sh'
-         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-js-utils && bash ~/TW_ACS_GIT/iad-js-utils/owasp-dependency-check.sh'
-      }
-    }
-    
     stage ('SAST_source_docker') { ++++++++++++++++++++++++++++++++++++++
       steps {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
@@ -74,7 +58,22 @@ pipeline {
                                       -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-js-utils'
          }
       }
+       stage ('SCA_sh') {
+      steps {
+         sh 'cd ~/TW_ACS_GIT/iad-ecacs2 && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_CORE" --scan "/home/kali/TW_ACS_GIT/iad-ecacs2" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'cd ~/TW_ACS_GIT/iad-web-app-core && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_WEB" --scan "/home/kali/TW_ACS_GIT/iad-web-app-core" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+         sh 'cd ~/TW_ACS_GIT/iad-js-utils && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_JS" --scan "/home/kali/TW_ACS_GIT/iad-js-utils" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+      }
+    }
     
+     stage ('SCA_docker') {
+      steps {
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-ecacs2 && sudo bash ~/TW_ACS_GIT/iad-ecacs2/owasp-dependency-check.sh'
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-web-app-core && sudo bash ~/TW_ACS_GIT/iad-web-app-core/owasp-dependency-check.sh'
+         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-js-utils && sudo bash ~/TW_ACS_GIT/iad-js-utils/owasp-dependency-check.sh'
+      }
+    }
+  
     stage ('Build_TW_ACS') {
       steps {
       sh 'cd ~/webapp_pub && npm install && npm run build && gdradle build'
