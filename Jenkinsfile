@@ -22,6 +22,14 @@ pipeline {
       }
     }
     
+    stage ('preparing_SCA_sh') {
+      steps {
+         sh 'VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)'
+         sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip -O dependency-check.zip'
+         sh 'unzip -u -o dependency-check.zip'
+      }
+    }  
+    
     stage ('SAST_source_docker') { ++++++++++++++++++++++++++++++++++++++
       steps {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
