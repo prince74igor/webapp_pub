@@ -29,22 +29,23 @@ pipeline {
          sh 'unzip -u -o dependency-check.zip'
       }
     }  
-    
-    stage ('SAST_source_docker') { ++++++++++++++++++++++++++++++++++++++
-      steps {
+   
+
+   stage ('SAST_source_docker') { 
+     steps {
           sh 'sudo docker ps | grep sonar || sudo docker run -d --name sonarqube -e SONAR_ES_BOOTSTRAP_CHECKS_DISABLE=true -p 9000:9000 sonarqube:latest'
           sh 'sudo docker run \
-                                                                                --rm \
-                                                                                -e SONAR_HOST_URL="http://172.17.0.2:9000" \
-                                                                                -e SONAR_SCANNER_OPTS="TW_ACS_CORE" \
-                                                                                -e SONAR_LOGIN="sqp_60500b4ec358a7sqp_6b303be2d0c0d1d0b5531fb752baadf59acfe389" \
-                                                                                -e SONAR_JAVA_BINARIES="/home/kali/TW_ACS_GIT/iad-ecacs2" \
-                                                                                -v "/home/kali/TW_ACS_GIT/iad-ecacs2:/usr/src" \
-                                                                                sonarsource/sonar-scanner-cli'
+                                      --rm \
+                                      -e SONAR_HOST_URL="http://172.17.0.2:9000" \
+                                      -e SONAR_SCANNER_OPTS="-Dsonar.projectKey=temp2" \
+                                      -e SONAR_LOGIN="sqp_ab37c8f4db8b28537e92889a9e409d9fac7af86d" \
+                                      -e SONAR_JAVA_BINARIES="/home/kali/1-0-3.1.44.3" \         # don't work 
+                                      -v "/home/kali/1-0-3.1.44.3:/usr/src" \
+                                      sonarsource/sonar-scanner-cli'
         }
       }
     
-      stage ('SAST_sh') {
+      stage ('SAST_sh') { # -C -C++
          steps {
               sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
                                       -Dsonar.projectKey=TW_ACS_CORE \
@@ -77,8 +78,7 @@ pipeline {
      stage ('SCA_docker') {
       steps {
          sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-ecacs2 && sudo bash ~/TW_ACS_GIT/iad-ecacs2/owasp-dependency-check.sh'
-         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-web-app-core && sudo bash ~/TW_ACS_GIT/iad-web-app-core/owasp-dependency-check.sh'
-         sh 'cp ~/webapp_pub/owasp-dependency-check.sh ~/TW_ACS_GIT/iad-js-utils && sudo bash ~/TW_ACS_GIT/iad-js-utils/owasp-dependency-check.sh'
+         sh 'sudo zip ~/TW_ACS_GIT/iad-ecacs2/odc-reports/TW_ACS_DCH.zip ~/TW_ACS_GIT/iad-ecacs2/odc-reports/dependency-check-report.html'
       }
     }
   
