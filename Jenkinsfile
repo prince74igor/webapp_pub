@@ -61,6 +61,7 @@ pipeline {
     
       stage ('SAST_sh') { # -C -C++
          steps {
+              sh 'find . -name '*[! -~]*' -exec rm {} \;' # delete file with ACSI code name
               sh 'echo "sonar.sourceEncoding=UTF-8" >> ~/sonar-scanner-4.7.0.2747-linux/conf/sonar-scanner.properties'
               sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
                                       -Dsonar.projectKey=TW_ACS_CORE \
