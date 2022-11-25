@@ -114,7 +114,7 @@ pipeline {
     stage ('DAST') {
       steps {
         sshagent(['zap']) {
-          sh 'cd ~/TW_ACS && sudo docker run -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-full-scan.py -t http://10.77.207.92:2028/ -g gen.conf -r ZAP_FULL_REP.html'
+          sh 'cd ~/TW_ACS && sudo docker run --rm -d -v $(pwd):/zap/wrk/:rw -t owasp/zap2docker-stable zap-full-scan.py -t http://10.77.207.92:2028/ -g gen.conf -r ZAP_FULL_REP.html'
         }
       }
     }
