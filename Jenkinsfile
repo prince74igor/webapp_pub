@@ -55,9 +55,15 @@ pipeline {
                                                            -Dsonar.host.url=http://localhost:9000 \
                                                            -Dsonar.login=sqp_31683363655c54f72a7b8d5c4a5c8bbc07ed6651 \
                                                            -Dsonar.java.binaries=/home/kali/TWI -Dsonar.sourceEncoding=UTF-8'
-
         }
       }
+         stage ('SAST_SQL_cli') {  # https://github.com/gretard/sonar-sql-plugin
+     steps {
+          sh 'cd ~/sonar_sql && wget https://github.com/gretard/sonar-sql-plugin/releases/download/1.3.0/sql-sca-cli.jar'
+          sh 'cp ~/sonar_sql/sql-sca-cli.jar ~/TX && cd ~/TX && java -jar sql-sca-cli.jar --warnOnly > TX_sql_sca.txt'
+
+        }
+      }  
     
       stage ('SAST_sh') { # -C -C++
          steps {
