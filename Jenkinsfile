@@ -64,23 +64,6 @@ pipeline {
               sh 'find . -name '*[! -~]*' -exec rm {} \;' # delete file with ACSI code name
               sh 'echo "sonar.sourceEncoding=UTF-8" >> ~/sonar-scanner-4.7.0.2747-linux/conf/sonar-scanner.properties'
               sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
-                                      -Dsonar.projectKey=TW_ACS_CORE \
-                                      -Dsonar.sources=/home/kali/TW_ACS_GIT/iad-ecacs2 \
-                                      -Dsonar.host.url=http://localhost:9000 \
-                                      -Dsonar.login=sqp_905ffe1d5b3316e808b8a19ae6591c5d69210476 \
-                                      -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-ecacs2'
-              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
-                                      -Dsonar.projectKey=TW_ACS_WEB \
-                                      -Dsonar.sources=/home/kali/TW_ACS_GIT/iad-web-app-core \
-                                      -Dsonar.host.url=http://localhost:9000 \
-                                      -Dsonar.login=sqp_b6aaa0ae304206af981a8b13d6f5c9e1f3191a07 \
-                                      -Dsonar.java.binaries=/home/kali/TW_ACS_GIT/iad-web-app-core'
-              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
-                                      -Dsonar.projectKey=flora_lib \
-                                      -Dsonar.sources=/home/kali/FloraWare/FloraWare_lib \
-                                      -Dsonar.host.url=http://localhost:9000 \
-                                      -Dsonar.login=sqp_7f74cf78c819d56c76da66848133a5f2ae6fb73a'
-              sh '~/sonar-scanner-4.7.0.2747-linux/bin/sonar-scanner \
                                                                 -Dsonar.projectKey=RadixWare \
                                                                 -Dsonar.sources=/home/kali/RadixWare/2.1.43.10.9/org.radixware/kernel/ \
                                                                 -Dsonar.host.url=http://localhost:9000 \
@@ -88,11 +71,19 @@ pipeline {
                                                                 -Dsonar.java.binaries=/home/kali/RadixWare/2.1.43.10.9/org.radixware/kernel/'
          }
       }
+    
        stage ('SCA_sh') {  # don't updaiting
       steps {
          sh 'cd ~/TW_ACS_GIT/iad-ecacs2 && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_CORE" --scan "/home/kali/TW_ACS_GIT/iad-ecacs2" --proxyserver proxy.compassplus.ru --proxyport 3128 '
          sh 'cd ~/TW_ACS_GIT/iad-web-app-core && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_WEB" --scan "/home/kali/TW_ACS_GIT/iad-web-app-core" --proxyserver proxy.compassplus.ru --proxyport 3128 '
          sh 'cd ~/TW_ACS_GIT/iad-js-utils && bash ~/dependency-check/bin/dependency-check.sh --project "TW_ACS_JS" --scan "/home/kali/TW_ACS_GIT/iad-js-utils" --proxyserver proxy.compassplus.ru --proxyport 3128 '
+      }
+    }
+    
+       stage ('SCA_C&C++') {  
+      steps {
+         sh 'cd ~/Flora/FloraWare && cppcheck --report-progress -v . --output-file=rep_scan_cpp --xml --force'
+         sh 'cd ~/Flora/FloraWare && cppcheck-htmlreport --report-dir=./HTML --source-dir=. --file=rep_scan_cpp'
       }
     }
     
