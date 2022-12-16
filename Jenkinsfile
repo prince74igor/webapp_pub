@@ -20,11 +20,13 @@ pipeline {
       }
     }
     
-    stage ('preparing_SCA_sh') {
+    stage ('preparing_SCA_sh&SAST_Secret') {
       steps {
          sh 'VERSION=$(curl -s https://jeremylong.github.io/DependencyCheck/current.txt)'
          sh 'wget https://github.com/jeremylong/DependencyCheck/releases/download/v$VERSION/dependency-check-$VERSION-release.zip -O dependency-check.zip'
          sh 'unzip -u -o dependency-check.zip'
+         sh 'wget https://github.com/adedayo/checkmate/releases/download/v0.8.3/checkmate_0.8.3_linux_amd64.tar.gz && tar -xvf checkmate_0.8.3_linux_amd64.tar.gz -C checkmate_0.8.3_linux_amd64'
+         sh 'sudo apt install ruby && gem install asciidoctor-pdf'
       }
     }  
    
@@ -61,7 +63,13 @@ pipeline {
         }
       }  
     
-
+         stage ('SAST_Secret') {  # https://github.com/gretard/sonar-sql-plugin
+     steps {
+          sh 'cp ./checkmate_0.8.3_linux_amd64/checkmate secretSearch ~/Source\ Code/TX/3.2.30.10.9/com.tranzaxis.millikartaz/'
+          sh 'cp $(find /tmp/ | grep .pdf) .'
+     }
+      } 
+    
     
        stage ('SCA_sh') {  # don't updaiting
       steps {
