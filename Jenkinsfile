@@ -8,7 +8,7 @@ pipeline {
                 // Generate HTML report
                 
                 // For example, if the HTML report is generated in 'reports' directory:
-                sh '~/test && python3 test_html.py'
+                sh 'cd ~/test && python3 test_html.py'
             }
         }
           
