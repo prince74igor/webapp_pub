@@ -19,7 +19,7 @@ stage('Publish HTML Report') {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: '~/test',
+                    reportDir: '/home/kali/test',
                     reportFiles: 'example.html',
                     reportName: 'My HTML Report'
                 ])
