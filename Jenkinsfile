@@ -8,8 +8,7 @@ pipeline {
                 // Generate HTML report
                 
                 // For example, if the HTML report is generated in 'reports' directory:
-                sh 'mkdir -p reports'
-                sh 'echo "<html><body><h1>Sample HTML Report</h1></body></html>" > reports/sample.html'
+                sh '~/test && python3 test_html.py'
             }
         }
           
@@ -20,8 +19,8 @@ stage('Publish HTML Report') {
                     allowMissing: false,
                     alwaysLinkToLastBuild: false,
                     keepAll: true,
-                    reportDir: 'reports',
-                    reportFiles: 'sample.html',
+                    reportDir: '~/test',
+                    reportFiles: 'example.html',
                     reportName: 'My HTML Report'
                 ])
             }
