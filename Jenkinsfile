@@ -8,7 +8,7 @@ pipeline {
                 // Generate HTML report
                 
                 // For example, if the HTML report is generated in 'reports' directory:
-                sh 'cd /home/kali/test/ && python3 test_html.py'
+                sh 'python3 /home/kali/test/test_html.py'
             }
         }
           
